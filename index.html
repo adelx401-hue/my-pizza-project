@@ -33,7 +33,6 @@
         }
         .logo { font-family: 'Pacifico', cursive; font-size: 2.8rem; margin: 0; background: linear-gradient(to right, var(--primary), #fff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        /* اختيار رقم 5: نظام الحالة المزاجية */
         .mood-selector { display: flex; justify-content: center; gap: 10px; margin: 15px 0; flex-wrap: wrap; }
         .mood-tag { font-size: 0.7rem; padding: 5px 12px; border-radius: 20px; border: 1px solid var(--primary); cursor: pointer; opacity: 0.6; }
         .mood-tag.active { opacity: 1; background: var(--primary); color: var(--dark); }
@@ -45,7 +44,6 @@
 
         .lab-section { background: rgba(255,255,255,0.03); margin: 20px; padding: 25px; border-radius: 30px; border: 2px dashed var(--primary); position: relative;}
         
-        /* اختيار رقم 3: شريط طاقة المختبر */
         .lab-energy-bar { width: 100%; height: 6px; background: #222; border-radius: 10px; margin-bottom: 15px; overflow: hidden; display: none; }
         #energyFill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--danger)); transition: 0.4s; }
 
@@ -69,7 +67,6 @@
         .opt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 6px; margin-bottom: 10px; }
         .opt-item { background: rgba(255,255,255,0.05); padding: 5px; border-radius: 8px; text-align: center; font-size: 0.7rem; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; }
         .opt-item.selected { background: var(--primary); color: #000; font-weight: bold; }
-        .opt-item.remove.selected { background: var(--danger); color: #fff; }
 
         #wheel-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 5000; display: none; flex-direction: column; justify-content: center; align-items: center; }
         .wheel-container { width: 280px; height: 280px; border: 5px solid var(--primary); border-radius: 50%; position: relative; overflow: hidden; transition: 4s; }
@@ -184,7 +181,6 @@
 </div>
 
 <script>
-    // اختيار رقم 1: نظام الصوت المحمي (لا يعمل إلا بعد نقرة)
     let audioReady = false;
     function playBeep(freq = 440) {
         if(!audioReady) return;
@@ -199,10 +195,8 @@
         } catch(e) { console.log("Audio blocked"); }
     }
 
-    // تفعيل الصوت عند أول لمسة للشاشة
     document.addEventListener('click', () => { audioReady = true; }, { once: true });
 
-    // اختيار رقم 3: شريط الطاقة
     function updateEnergy() {
         const bar = document.getElementById('energyBar');
         const fill = document.getElementById('energyFill');
@@ -213,7 +207,6 @@
         fill.style.width = percentage + '%';
     }
 
-    // اختيار رقم 5: الحالة المزاجية
     function setMood(mood, btn) {
         document.querySelectorAll('.mood-tag').forEach(t => t.classList.remove('active'));
         btn.classList.add('active');
@@ -319,7 +312,6 @@
     }
 
     function showFinalReview() {
-        // اختيار رقم 9: عداد وقت عشوائي
         document.getElementById('timerMinutes').innerText = 15 + Math.floor(Math.random()*15);
         document.getElementById('cartList').innerHTML = cart.map(i => `<div style="padding:5px 0; border-bottom:1px solid #333">${i.name} - ${i.price} ر.ي</div>`).join('');
         document.getElementById('modalTotal').innerText = document.getElementById('mainTotal').innerText;
@@ -332,15 +324,27 @@
         document.getElementById('spinBtn').disabled = false; 
     }
 
-    function finalSend() {
+    async function finalSend() {
         const name = document.getElementById('userName').value || "مسافر";
-        let msg = `*👨‍🚀 طلب شيف أحمد 2026*\n*الاسم:* ${name}\n`;
-        cart.forEach((i, idx) => msg += `${idx+1}. ${i.name}\n`);
-        msg += `*الجائزة:* ${myGift}\n*الإجمالي:* ${document.getElementById('mainTotal').innerText} ريال`;
-        window.open(`https://wa.me/967738195024?text=${encodeURIComponent(msg)}`, '_blank');
-    }
+        const total = document.getElementById('mainTotal').innerText;
+        
+        // إرسال للسيرفر MongoDB
+        const orderData = {
+            name: name,
+            cart: cart.map(i => ({ name: i.name, price: i.price, extras: i.opts })),
+            total: total
+        };
 
-    showCat('سندوتشات', document.querySelector('.nav-tab'));
-</script>
-</body>
-</html>
+        try {
+            await fetch('https://my-pizza-project.onrender.com/api/orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(orderData)
+            });
+        } catch(err) { console.log("Database Save Error"); }
+
+        // إرسال للواتساب
+        let msg = `*👨‍🚀 طلب شيف أحمد 2026*\n*الاسم:* ${name}\n`;
+        cart.forEach((i, idx) => {
+            msg += `${idx+1}. ${i.name}\n`;
+            if(i.opts.length > 0) msg += `   ➕ إض
