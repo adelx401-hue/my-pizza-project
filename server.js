@@ -5,6 +5,7 @@ const cors = require('cors');
 const app = express();
 app.use(express.json());
 app.use(cors());
+app.use(express.static(__dirname));
 
 // اتصال تجريبي
 mongoose.connect('mongodb://localhost:27017/chefAhmedDB')
@@ -36,6 +37,9 @@ app.post('/api/orders', async (req, res) => {
 
 app.get('/api/orders', async (req, res) => {
     res.json([{customerName: "تجربة", status: "يعمل بنجاح"}]);
+});
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/index.html');
 });
 
 app.listen(3000, () => console.log('✅ السيرفر يعمل الآن على منفذ 3000'));
