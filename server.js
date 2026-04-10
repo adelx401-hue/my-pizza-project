@@ -7,20 +7,23 @@ app.use(express.json());
 app.use(cors());
 app.use(express.static(__dirname));
 
-// اتصال تجريبي
-mongoose.connect('mongodb://localhost:27017/chefAhmedDB')
-    .catch(err => console.log("تحذير: السيرفر يعمل بدون قاعدة بيانات حالياً"));
+// الاتصال بقاعدة البيانات السحابية
+mongoose.connect('mongodb+srv://ahmed:Ahmed12345@cluster0.wmqhezu.mongodb.net/myPizzaDB?retryWrites=true&w=majority')
+    .then(() => console.log('✅ متصل بقاعدة البيانات السحابية بنجاح'))
+    .catch(err => console.log('❌ فشل الاتصال بقاعدة البيانات:', err));
 
+// تعريف شكل بيانات الطلبات
 const OrderSchema = new mongoose.Schema({
-  customerName: String,
-  items: Array,
-  totalPrice: Number,
-  status: { type: String, default: 'قيد الانتظار' },
-  createdAt: { type: Date, default: Date.now }
+    customerName: String,
+    items: Array,
+    totalPrice: Number,
+    status: { type: String, default: 'قيد الانتظار' },
+    createdAt: { type: Date, default: Date.now }
 });
 
 const Order = mongoose.model('Order', OrderSchema);
 
+// استقبال طلب جديد من الزبون
 app.post('/api/orders', async (req, res) => {
     try {
         const newOrder = new Order({
@@ -28,36 +31,35 @@ app.post('/api/orders', async (req, res) => {
             items: req.body.cart,
             totalPrice: req.body.total
         });
+        await newOrder.save();
         console.log("وصل طلب جديد من: " + req.body.name);
-        res.status(201).json({ message: "تم استلام الطلب" });
+        res.status(201).json({ message: "تم استلام الطلب بنجاح" });
     } catch (err) {
-        res.status(400).json({ error: "خطأ" });
+        res.status(400).json({ error: "خطأ في استقبال الطلب" });
     }
 });
 
-
-    // 1. مسار صفحة المدير (لوحة التحكم)
-app.get('/admin', (req, res) => {
-    res.sendFile(__dirname + '/admin.html');
-});
-
-// 2. مسار جلب الطلبات من قاعدة البيانات
+// جلب جميع الطلبات لصفحة المدير
 app.get('/api/orders', async (req, res) => {
     try {
-        const orders = await Order.find().sort({ createdAt: -1 }); 
+        const orders = await Order.find().sort({ createdAt: -1 });
         res.json(orders);
     } catch (err) {
         res.status(500).json({ error: "خطأ في جلب البيانات" });
     }
 });
 
-// 3. مسار الصفحة الرئيسية للزبائن
+// مسارات الصفحات
+app.get('/admin', (req, res) => {
+    res.sendFile(__dirname + '/admin.html');
+});
+
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
 
-// 4. تشغيل السيرفر (يجب أن يكون في النهاية)
+// تشغيل السيرفر
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`✅ السيرفر يعمل الآن على المنفذ ${PORT}`);
+    console.log(`🚀 السيرفر يعمل الآن على المنفذ ${PORT}`);
 });
