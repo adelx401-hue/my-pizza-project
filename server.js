@@ -36,26 +36,28 @@ app.post('/api/orders', async (req, res) => {
 });
 
 
-    res.json([{customerName: "تجربة", status: "يعمل بنجاح"}]);
-});
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
-});
-// إضافة مسارات صفحة المدير والبيانات
+    // 1. مسار صفحة المدير (لوحة التحكم)
 app.get('/admin', (req, res) => {
     res.sendFile(__dirname + '/admin.html');
 });
 
+// 2. مسار جلب الطلبات من قاعدة البيانات
 app.get('/api/orders', async (req, res) => {
     try {
-        const orders = await Order.find().sort({ date: -1 }); 
+        const orders = await Order.find().sort({ createdAt: -1 }); 
         res.json(orders);
     } catch (err) {
-        res.status(500).send("خطأ في جلب البيانات");
+        res.status(500).json({ error: "خطأ في جلب البيانات" });
     }
 });
 
-app.listen(3000, () => console.log('✅ السيرفر يعمل الآن على منفذ 3000'));
+// 3. مسار الصفحة الرئيسية للزبائن
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
+});
 
-
-
+// 4. تشغيل السيرفر (يجب أن يكون في النهاية)
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`✅ السيرفر يعمل الآن على المنفذ ${PORT}`);
+});
