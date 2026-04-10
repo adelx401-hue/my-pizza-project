@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHEF AHMED | THE COSMOS 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Pacifico&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00d2ff; --danger: #ff0055; --warning: #fbc531;
+            --dark: #0a0b1e; --glass: rgba(255, 255, 255, 0.1);
+            --neon-border: 0 0 15px rgba(0, 210, 255, 0.5);
+        }
+
+        body.light-hunger { --primary: #92fe9d; --dark: #0f2027; --neon-border: 0 0 15px rgba(146, 254, 157, 0.5); }
+        body.med-hunger { --primary: #00d2ff; --dark: #0a0b1e; --neon-border: 0 0 15px rgba(0, 210, 255, 0.5); }
+        body.beast-hunger { --primary: #ff4757; --dark: #1e0000; --neon-border: 0 0 15px rgba(255, 71, 87, 0.5); }
+
+        * { box-sizing: border-box; font-family: 'Cairo', sans-serif; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        body { 
+            background: var(--dark); 
+            background-image: radial-gradient(white, rgba(255,255,255,.05) 1px, transparent 40px);
+            background-size: 200px 200px;
+            color: #e0e0e0; margin: 0; padding-bottom: 120px; overflow-x: hidden; 
+        }
+
+        .main-container { max-width: 600px; margin: 0 auto; }
+
+        header {
+            background: rgba(15, 12, 41, 0.9); backdrop-filter: blur(10px);
+            padding: 30px 20px; text-align: center; border-radius: 0 0 40px 40px; 
+            border-bottom: 2px solid var(--primary); box-shadow: 0 5px 25px rgba(0, 210, 255, 0.2);
+        }
+        .logo { font-family: 'Pacifico', cursive; font-size: 2.8rem; margin: 0; background: linear-gradient(to right, var(--primary), #fff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        /* اختيار رقم 5: نظام الحالة المزاجية */
+        .mood-selector { display: flex; justify-content: center; gap: 10px; margin: 15px 0; flex-wrap: wrap; }
+        .mood-tag { font-size: 0.7rem; padding: 5px 12px; border-radius: 20px; border: 1px solid var(--primary); cursor: pointer; opacity: 0.6; }
+        .mood-tag.active { opacity: 1; background: var(--primary); color: var(--dark); }
+
+        .hunger-wrap { background: var(--glass); backdrop-filter: blur(15px); margin: -20px 15px 20px; padding: 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); text-align: center; }
+        .hunger-btns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        .h-btn { padding: 10px; border: 1px solid var(--primary); border-radius: 12px; cursor: pointer; font-size: 0.8rem; color: var(--primary); background: transparent; }
+        .h-btn.active { background: var(--primary); color: var(--dark); box-shadow: var(--neon-border); font-weight: 900; }
+
+        .lab-section { background: rgba(255,255,255,0.03); margin: 20px; padding: 25px; border-radius: 30px; border: 2px dashed var(--primary); position: relative;}
+        
+        /* اختيار رقم 3: شريط طاقة المختبر */
+        .lab-energy-bar { width: 100%; height: 6px; background: #222; border-radius: 10px; margin-bottom: 15px; overflow: hidden; display: none; }
+        #energyFill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--danger)); transition: 0.4s; }
+
+        .lab-group { margin-bottom: 20px; }
+        .lab-group-title { font-weight: 900; font-size: 0.85rem; color: var(--primary); border-right: 4px solid var(--danger); padding-right: 10px; margin-bottom: 10px; display: block; }
+        .lab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; }
+        .lab-item { background: rgba(255,255,255,0.05); padding: 8px; border-radius: 10px; text-align: center; font-size: 0.7rem; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; font-weight: bold; }
+        .lab-item.selected { background: var(--primary); color: var(--dark); border-color: var(--primary); box-shadow: 0 0 10px var(--primary); }
+
+        .nav-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 15px; position: sticky; top: 0; background: rgba(10, 11, 30, 0.95); z-index: 100; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .nav-tab { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 15px; font-weight: 700; white-space: nowrap; color: #fff; cursor: pointer; }
+        .nav-tab.active { background: var(--primary); color: var(--dark); box-shadow: var(--neon-border); }
+
+        .items-grid { display: flex; flex-direction: column; gap: 15px; padding: 15px; }
+        .food-card { background: var(--glass); border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+        .food-main { display: flex; cursor: pointer; height: 110px; }
+        .food-card img { width: 110px; height: 110px; object-fit: cover; }
+        .food-info { padding: 12px; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+
+        .extra-options { display: none; padding: 15px; background: rgba(0,0,0,0.4); border-top: 1px solid var(--primary); }
+        .opt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 6px; margin-bottom: 10px; }
+        .opt-item { background: rgba(255,255,255,0.05); padding: 5px; border-radius: 8px; text-align: center; font-size: 0.7rem; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; }
+        .opt-item.selected { background: var(--primary); color: #000; font-weight: bold; }
+        .opt-item.remove.selected { background: var(--danger); color: #fff; }
+
+        #wheel-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 5000; display: none; flex-direction: column; justify-content: center; align-items: center; }
+        .wheel-container { width: 280px; height: 280px; border: 5px solid var(--primary); border-radius: 50%; position: relative; overflow: hidden; transition: 4s; }
+        .wheel-section { position: absolute; width: 50%; height: 50%; transform-origin: 100% 100%; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; color: #fff; font-weight: bold; }
+
+        #review-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 4000; display: none; padding: 20px; }
+        .review-box { background: #1a1a2e; border: 1px solid var(--primary); border-radius: 25px; width: 100%; max-width: 450px; margin: auto; padding: 20px; }
+
+        .footer-dock { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10, 11, 30, 0.98); padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--primary); z-index: 1000; }
+        .btn-order { background: linear-gradient(45deg, var(--danger), #ff00bb); color: white; border: none; padding: 12px 25px; border-radius: 15px; font-weight: 900; cursor: pointer; }
+        input { background: var(--glass); color: white; border: 1px solid var(--primary); width:100%; padding:15px; border-radius:15px; text-align:center; outline: none; }
+    </style>
+</head>
+<body class="med-hunger">
+
+<div class="main-container">
+    <header>
+        <div class="logo">Chef Ahmed</div>
+        <p style="font-size: 0.8rem; color: var(--primary); letter-spacing: 2px;">استراتيجية النكهات الفضائية 2026</p>
+        
+        <div class="mood-selector">
+            <div class="mood-tag" onclick="setMood('focus', this)">🎯 وضع التركيز</div>
+            <div class="mood-tag active" onclick="setMood('normal', this)">🌌 طبيعي</div>
+            <div class="mood-tag" onclick="setMood('party', this)">🎉 وضع الوحش</div>
+        </div>
+    </header>
+
+    <div class="hunger-wrap">
+        <div class="hunger-btns">
+            <div class="h-btn" onclick="setHunger('light', this)">🙂 خفيف</div>
+            <div class="h-btn active" onclick="setHunger('med', this)">😋 متوسط</div>
+            <div class="h-btn" onclick="setHunger('beast', this)">🦁 وحش جائع</div>
+        </div>
+    </div>
+
+    <div style="padding:0 15px"><input type="text" id="userName" placeholder="الاسم الرمزي للمسافر..."></div>
+
+    <div class="lab-section">
+        <h3 style="margin-top:0; color:var(--primary); text-align:center;">🔬 مختبر الابتكار الكوني</h3>
+        <div class="lab-energy-bar" id="energyBar"><div id="energyFill"></div></div>
+
+        <div class="lab-group">
+            <span class="lab-group-title">1. نوع الخبز</span>
+            <div class="lab-grid">
+                <div class="lab-item" onclick="toggleLab(this)">خبز</div><div class="lab-item" onclick="toggleLab(this)">دبل خبز</div>
+                <div class="lab-item" onclick="toggleLab(this)">خبز عربي</div><div class="lab-item" onclick="toggleLab(this)">دبل عربي</div>
+                <div class="lab-item" onclick="toggleLab(this)">خبز برجر</div><div class="lab-item" onclick="toggleLab(this)">روتي موكه</div>
+            </div>
+        </div>
+        <div class="lab-group">
+            <span class="lab-group-title">2. الحشوة والجبن</span>
+            <div class="lab-grid">
+                <div class="lab-item" onclick="toggleLab(this)">دبل طعمية</div><div class="lab-item" onclick="toggleLab(this)">جبن</div>
+                <div class="lab-item" onclick="toggleLab(this)">دبل جبن</div><div class="lab-item" onclick="toggleLab(this)">خفيف سلطة</div>
+                <div class="lab-item" onclick="toggleLab(this)">قطعة كرسبي</div>
+            </div>
+        </div>
+        <div class="lab-group">
+            <span class="lab-group-title">3. الصوصات واللمسات</span>
+            <div class="lab-grid">
+                <div class="lab-item" onclick="toggleLab(this)">لمسه اسبيسي</div><div class="lab-item" onclick="toggleLab(this)">زيادة اسبيسي</div>
+                <div class="lab-item" onclick="toggleLab(this)">لمسه شطة</div><div class="lab-item" onclick="toggleLab(this)">لمسه ثوم</div>
+                <div class="lab-item" onclick="toggleLab(this)">شبس بـ 100</div><div class="lab-item" onclick="toggleLab(this)">تسخين 🔥</div>
+            </div>
+        </div>
+        <button class="btn-order" onclick="addCustomSandwich()" style="background:var(--primary); width:100%; color:var(--dark);">إضافة ابتكاري للسلة 🧪</button>
+    </div>
+
+    <div class="nav-scroll">
+        <button class="nav-tab active" onclick="showCat('سندوتشات', this)">🛰️ سندوتشات</button>
+        <button class="nav-tab" onclick="showCat('بيتزا', this)">🌑 بيتزا</button>
+        <button class="nav-tab" onclick="showCat('فلافل', this)">☄️ فلافل</button>
+        <button class="nav-tab" onclick="showCat('عصائر', this)">🍹 عصائر</button>
+    </div>
+
+    <div class="items-grid" id="menuGrid"></div>
+</div>
+
+<div id="wheel-overlay">
+    <div class="wheel-container" id="wheel">
+        <div class="wheel-section" style="background:#ff4757; transform:rotate(0deg) skew(45deg);">بطاطس</div>
+        <div class="wheel-section" style="background:#2ed573; transform:rotate(90deg) skew(45deg);">بيبسي</div>
+        <div class="wheel-section" style="background:#ffa502; transform:rotate(180deg) skew(45deg);">ون سي</div>
+        <div class="wheel-section" style="background:#1e90ff; transform:rotate(270deg) skew(45deg);">جبن</div>
+    </div>
+    <button class="btn-order" onclick="spinWheel()" id="spinBtn" style="margin-top:20px;">إبرم العجلة! 🌀</button>
+</div>
+
+<div id="review-modal">
+    <div class="review-box">
+        <h3 style="color:var(--primary); text-align: center;">📜 تأكيد الطلب</h3>
+        <div id="takeoffTimer" style="text-align:center; font-size:0.8rem; color:var(--warning); margin-bottom:15px; border: 1px dashed var(--warning); padding: 5px; border-radius: 10px;">
+            🚀 زمن وصول الكبسولة: <span id="timerMinutes">--</span> دقيقة
+        </div>
+        <div id="cartList" style="max-height: 200px; overflow-y: auto; color: white; font-size: 0.8rem;"></div>
+        <p id="giftText" style="color:var(--primary); text-align: center; font-weight: bold;"></p>
+        <div style="display:flex; justify-content:space-between; color: var(--warning); font-weight: bold; margin-top:10px;">
+            <span>الإجمالي:</span><span><span id="modalTotal">0</span> ريال</span>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:20px;">
+            <button class="btn-order" style="background:#444;" onclick="closeReview()">تعديل</button>
+            <button class="btn-order" onclick="finalSend()">إرسال ✅</button>
+        </div>
+    </div>
+</div>
+
+<div class="footer-dock">
+    <div class="main-container" style="display:flex; width:100%; justify-content:space-between; align-items:center;">
+        <div style="font-size:1.2rem; font-weight:900; color:var(--primary);"><span id="mainTotal">0</span> ريال</div>
+        <button class="btn-order" onclick="openReview()">السلة ( <span id="cartCount">0</span> )</button>
+    </div>
+</div>
+
+<script>
+    // اختيار رقم 1: نظام الصوت المحمي (لا يعمل إلا بعد نقرة)
+    let audioReady = false;
+    function playBeep(freq = 440) {
+        if(!audioReady) return;
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.frequency.value = freq; osc.start();
+            gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.1);
+            osc.stop(ctx.currentTime + 0.1);
+        } catch(e) { console.log("Audio blocked"); }
+    }
+
+    // تفعيل الصوت عند أول لمسة للشاشة
+    document.addEventListener('click', () => { audioReady = true; }, { once: true });
+
+    // اختيار رقم 3: شريط الطاقة
+    function updateEnergy() {
+        const bar = document.getElementById('energyBar');
+        const fill = document.getElementById('energyFill');
+        const selectedCount = document.querySelectorAll('.lab-item.selected').length;
+        if(selectedCount > 0) bar.style.display = 'block';
+        else bar.style.display = 'none';
+        const percentage = Math.min((selectedCount / 8) * 100, 100);
+        fill.style.width = percentage + '%';
+    }
+
+    // اختيار رقم 5: الحالة المزاجية
+    function setMood(mood, btn) {
+        document.querySelectorAll('.mood-tag').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+        playBeep(300);
+    }
+
+    function setHunger(level, btn) {
+        document.querySelectorAll('.h-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.body.className = level + '-hunger';
+        playBeep(level === 'beast' ? 200 : 400);
+    }
+
+    const extraOpts = {
+        food: { plus: ['ثوم', 'شطة', 'كتشاب', 'صوص حار', 'صوص بارد'], minus: ['بدون طماطم', 'بدون خيار', 'بدون بصل'] },
+        drinks: { plus: ['عسل', 'مكسرات', 'زيادة سكر'], minus: ['بدون سكر', 'بدون ثلج'] }
+    };
+
+    const names = {
+        'سندوتشات': ['زنجر سوبريم', 'تورتيلا حار', 'برجر لحم', 'شاورما صاروخ', 'كبدة جبن'],
+        'بيتزا': ['بيتزا مارجريتا', 'بيتزا خضار', 'بيتزا بيبيروني', 'بيتزا دجاج'],
+        'فلافل': ['فلافل عادي', 'فلافل جبن', 'فلافل ملكي'],
+        'عصائر': ['عصير كوكتيل', 'عصير مانجو', 'عصير أفوكادو']
+    };
+
+    const db = [];
+    Object.keys(names).forEach(c => {
+        names[c].forEach((name, i) => {
+            db.push({ id: c+i, cat: c, name: name, price: Math.floor(Math.random()*1000)+500, img: `https://loremflickr.com/200/200/food?random=${Math.random()}` });
+        });
+    });
+
+    let cart = [];
+    let myGift = "";
+
+    function toggleLab(el) { 
+        el.classList.toggle('selected'); 
+        playBeep(600);
+        updateEnergy();
+    }
+
+    function addCustomSandwich() {
+        const parts = Array.from(document.querySelectorAll('.lab-item.selected')).map(e => e.innerText);
+        if(parts.length < 1) return alert("اختر مكونات الابتكار!");
+        cart.push({ name: "🧪 ابتكار: " + parts.join(' + '), price: 1500, opts: [] });
+        updateUI(); playBeep(800);
+        alert("تمت الإضافة!");
+    }
+
+    function showCat(cat, btn) {
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active')); btn.classList.add('active');
+        const grid = document.getElementById('menuGrid');
+        grid.innerHTML = db.filter(i => i.cat === cat).map(item => `
+            <div class="food-card" id="card-${item.id}">
+                <div class="food-main" onclick="toggleOptions('${item.id}')">
+                    <img src="${item.img}">
+                    <div class="food-info">
+                        <span style="font-weight:900;">${item.name}</span>
+                        <span style="color:var(--primary); font-weight:bold;">${item.price} ر.ي</span>
+                    </div>
+                </div>
+                <div class="extra-options" id="opt-${item.id}">
+                    <div class="opt-grid">${(cat==='عصائر'?extraOpts.drinks.plus:extraOpts.food.plus).map(ex=>`<div class="opt-item" onclick="this.classList.toggle('selected'); playBeep(700);">${ex}</div>`).join('')}</div>
+                    <button class="btn-order" style="width:100%; margin-top:10px;" onclick="addToCart('${item.id}','${item.name}',${item.price})">تأكيد 🛒</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function toggleOptions(id) {
+        const el = document.getElementById(`opt-${id}`);
+        el.style.display = el.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function addToCart(id, name, price) {
+        const card = document.getElementById(`card-${id}`);
+        const opts = Array.from(card.querySelectorAll('.opt-item.selected')).map(e => e.innerText);
+        cart.push({ name, price, opts });
+        updateUI(); toggleOptions(id); playBeep(1000);
+    }
+
+    function updateUI() {
+        document.getElementById('mainTotal').innerText = cart.reduce((s,i)=>s+i.price,0);
+        document.getElementById('cartCount').innerText = cart.length;
+    }
+
+    function openReview() {
+        if(cart.length === 0) return alert("السلة فارغة!");
+        document.getElementById('wheel-overlay').style.display = 'flex';
+    }
+
+    function spinWheel() {
+        const wheel = document.getElementById('wheel');
+        const deg = 1800 + Math.random() * 1000;
+        wheel.style.transform = `rotate(${deg}deg)`;
+        document.getElementById('spinBtn').disabled = true;
+        setTimeout(() => {
+            const gifts = ["بطاطس","بيبسي","ون سي","جبن"];
+            myGift = gifts[Math.floor(Math.random()*4)];
+            document.getElementById('wheel-overlay').style.display = 'none';
+            showFinalReview();
+        }, 4000);
+    }
+
+    function showFinalReview() {
+        // اختيار رقم 9: عداد وقت عشوائي
+        document.getElementById('timerMinutes').innerText = 15 + Math.floor(Math.random()*15);
+        document.getElementById('cartList').innerHTML = cart.map(i => `<div style="padding:5px 0; border-bottom:1px solid #333">${i.name} - ${i.price} ر.ي</div>`).join('');
+        document.getElementById('modalTotal').innerText = document.getElementById('mainTotal').innerText;
+        document.getElementById('giftText').innerText = "🎁 الجائزة: " + myGift;
+        document.getElementById('review-modal').style.display = 'flex';
+    }
+
+    function closeReview() { 
+        document.getElementById('review-modal').style.display = 'none'; 
+        document.getElementById('spinBtn').disabled = false; 
+    }
+
+    function finalSend() {
+        const name = document.getElementById('userName').value || "مسافر";
+        let msg = `*👨‍🚀 طلب شيف أحمد 2026*\n*الاسم:* ${name}\n`;
+        cart.forEach((i, idx) => msg += `${idx+1}. ${i.name}\n`);
+        msg += `*الجائزة:* ${myGift}\n*الإجمالي:* ${document.getElementById('mainTotal').innerText} ريال`;
+        window.open(`https://wa.me/967738195024?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    showCat('سندوتشات', document.querySelector('.nav-tab'));
+</script>
+</body>
+</html>
