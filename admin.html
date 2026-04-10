@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة إدارة الطلبات الشاملة</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: auto; }
+        h1 { text-align: center; color: #1e272e; border-bottom: 3px solid #ffa502; padding-bottom: 10px; }
+        .refresh-btn { display: inline-block; background: #2ed573; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 10px; overflow: hidden; }
+        th, td { padding: 15px; text-align: center; border-bottom: 1px solid #eee; }
+        th { background-color: #1e272e; color: white; }
+        .badge { padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .pizza { background: #ff4757; color: white; }
+        .sandwich { background: #eccc68; color: #2f3542; }
+        .juice { background: #70a1ff; color: white; }
+        .falafel { background: #2ed573; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍕 قائمة طلبات مطعم عادل 🍟</h1>
+        <a href="javascript:location.reload()" class="refresh-btn">تحديث الطلبات 🔄</a>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>الزبون</th>
+                    <th>نوع الصنف</th>
+                    <th>الطلب بالتفصيل</th>
+                    <th>العنوان/الهاتف</th>
+                    <th>الوقت</th>
+                </tr>
+            </thead>
+            <tbody id="ordersBody">
+                </tbody>
+        </table>
+    </div>
+
+    <script>
+        fetch('/api/orders')
+            .then(res => res.json())
+            .then(data => {
+                const body = document.getElementById('ordersBody');
+                data.forEach(order => {
+                    // تحديد لون "البادج" بناءً على نوع الصنف
+                    let badgeClass = 'pizza'; 
+                    if(order.category === 'سندوتش') badgeClass = 'sandwich';
+                    if(order.category === 'عصير') badgeClass = 'juice';
+                    if(order.category === 'فلافل') badgeClass = 'falafel';
+
+                    body.innerHTML += `
+                        <tr>
+                            <td><strong>${order.customerName}</strong></td>
+                            <td><span class="badge ${badgeClass}">${order.category || 'صنف متنوع'}</span></td>
+                            <td>${order.orderDetail}</td>
+                            <td>${order.address}</td>
+                            <td>${new Date(order.date).toLocaleTimeString('ar-YE')}</td>
+                        </tr>`;
+                });
+            });
+    </script>
+</body>
+</html>
