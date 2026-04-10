@@ -35,11 +35,24 @@ app.post('/api/orders', async (req, res) => {
     }
 });
 
-app.get('/api/orders', async (req, res) => {
+
     res.json([{customerName: "تجربة", status: "يعمل بنجاح"}]);
 });
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
+});
+// إضافة مسارات صفحة المدير والبيانات
+app.get('/admin', (req, res) => {
+    res.sendFile(__dirname + '/admin.html');
+});
+
+app.get('/api/orders', async (req, res) => {
+    try {
+        const orders = await Order.find().sort({ date: -1 }); 
+        res.json(orders);
+    } catch (err) {
+        res.status(500).send("خطأ في جلب البيانات");
+    }
 });
 
 app.listen(3000, () => console.log('✅ السيرفر يعمل الآن على منفذ 3000'));
